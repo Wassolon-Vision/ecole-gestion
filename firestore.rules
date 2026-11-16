@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function hasProfile() {
+      return request.auth != null
+        && exists(/databases/$(db)/documents/users/$(request.auth.uid));
+    }
+    function profile() {
+      return get(/databases/$(db)/documents/users/$(request.auth.uid)).data;
+    }
+    function active() { return hasProfile() && profile().actif == true; }
+    function isDirection() { return active() && profile().role == 'direction'; }
+    function isStaff() { return active() && profile().role in ['direction', 'enseignant']; }
+    function firstRun() { return !exists(/databases/$(db)/documents/config/ecole); }
+
+    // Informations générales de l'école
+    match /config/ecole {
+      allow read: if true;
+      allow create: if request.auth != null && firstRun();
+      allow update: if isDirection();
+    }
+
+    // Compteur des matricules
+    match /config/compteur {
+      allow read, write: if isDirection();
+    }
+
+    // Profils des utilisateurs
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isDirection());
+      allow create: if isDirection()
+        || (request.auth != null && request.auth.uid == uid && firstRun()
+            && request.resource.data.role == 'direction');
+      allow update, delete: if isDirection();
+    }
+
+    // Élèves : le personnel voit tout, un parent ne voit que son enfant
+    match /students/{id} {
+      allow read: if isStaff()
+        || (active() && profile().role == 'parent' && profile().eleveId == id);
+      allow create, update, delete: if isDirection();
+    }
+
+    // Codes d'accès : visibles seulement par la direction
+    match /codes/{id} {
+      allow read, write: if isDirection();
+    }
+  }
+}
