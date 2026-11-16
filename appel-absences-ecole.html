@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Appel et absences – Groupe Scolaire Privé Wassolon Fondation</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#ffffff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#1d4ed8;--brand2:#1e3a8a;--soft:#eef2ff;--ok:#15803d;--okbg:#dcfce7;--abs:#b91c1c;--absbg:#fee2e2;--late:#b45309;--latebg:#fef3c7;--err:#b91c1c;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0f172a;--card:#172036;--text:#f1f5f9;--muted:#94a3b8;--line:#263353;--brand:#3b82f6;--brand2:#172554;--soft:#1e2a47;--ok:#86efac;--okbg:#14391f;--abs:#fca5a5;--absbg:#451a1a;--late:#fcd34d;--latebg:#4a3410;--err:#fca5a5;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0f172a;--card:#172036;--text:#f1f5f9;--muted:#94a3b8;--line:#263353;--brand:#3b82f6;--brand2:#172554;--soft:#1e2a47;--ok:#86efac;--okbg:#14391f;--abs:#fca5a5;--absbg:#451a1a;--late:#fcd34d;--latebg:#4a3410;--err:#fca5a5;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:18px 24px}
+header small{display:block;color:#dbe4ff;font-size:13px}
+header h1{margin:0;font-size:22px}
+main{max-width:900px;margin:0 auto;padding:18px 16px 40px}
+.ctl{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+select,input{padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);font:inherit}
+.ctl select,.ctl input{flex:1;min-width:150px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tabs button{border:0;background:none;color:var(--muted);padding:10px 14px;font:600 14px inherit;font-family:inherit;cursor:pointer;border-bottom:3px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--brand);border-bottom-color:var(--brand)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+.btn.sec{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.r{display:grid;grid-template-columns:1.2fr 1.4fr 1fr;gap:10px;align-items:center;padding:11px 16px;border-top:1px solid var(--line)}
+.r:first-child{border-top:0}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--card);color:var(--muted);padding:8px 6px;font:600 13px inherit;font-family:inherit;cursor:pointer;border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}
+.seg button.p[aria-pressed="true"]{background:var(--okbg);color:var(--ok)}
+.seg button.a[aria-pressed="true"]{background:var(--absbg);color:var(--abs)}
+.seg button.l[aria-pressed="true"]{background:var(--latebg);color:var(--late)}
+.ex select,.ex input{width:100%}
+.sm{color:var(--muted);font-size:13px}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin:14px 0}
+.err{color:var(--err);font-size:13px;min-height:18px;text-align:right}
+.sum{margin-top:6px;padding:16px}
+.sum h2{margin:0 0 10px;font-size:16px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.chip{font-size:13px;font-weight:600;padding:3px 10px;border-radius:6px}
+.chip.p{background:var(--okbg);color:var(--ok)}.chip.a{background:var(--absbg);color:var(--abs)}.chip.l{background:var(--latebg);color:var(--late)}
+.par{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.link{color:var(--brand);text-decoration:underline;cursor:pointer;background:none;border:0;font:inherit;font-size:13px;padding:0;margin-left:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:10px 14px;text-align:left;border-top:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px;border-top:0}
+td.n,th.n{text-align:center}
+.tw{overflow-x:auto}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.note{font-size:12px;color:var(--muted);margin-top:16px}
+@media (max-width:640px){.r{grid-template-columns:1fr}header{padding:14px 16px}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<a href="./" class="np-back" style="position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:10px;z-index:50;background:#fff;color:#1d4ed8;border:1px solid #cbd5e1;border-radius:8px;padding:6px 10px;font:600 13px system-ui,sans-serif;text-decoration:none">← Retour au menu</a><style>@media print{.np-back{display:none!important}}</style>
+<header><small>Groupe Scolaire Privé Wassolon Fondation, Kankan – 2026-2027</small><h1>Appel et absences</h1></header>
+<main>
+  <div class="ctl">
+    <select id="cl" aria-label="Classe"></select>
+    <input id="dt" type="date" aria-label="Date de l’appel">
+  </div>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-t="a" aria-selected="true">Appel du jour</button>
+    <button role="tab" data-t="s" aria-selected="false">Suivi des absences</button>
+  </div>
+
+  <section id="pa">
+    <p class="sm" id="tit" style="margin:0 0 10px"></p>
+    <div class="card" id="rows"></div>
+    <div class="acts"><button class="btn sec" id="allp">Tous présents</button><button class="btn" id="sv">Enregistrer l’appel</button></div>
+    <div class="err" id="er" role="alert"></div>
+    <div class="card sum" id="sum" hidden></div>
+  </section>
+
+  <section id="ps" hidden>
+    <div class="card tw"><table><thead><tr><th>Élève</th><th class="n">Absences</th><th class="n">Justifiées</th><th class="n">Retards</th><th>Dates des absences</th></tr></thead><tbody id="sb"></tbody></table></div>
+  </section>
+  <p class="note">Aperçu avec des données d’exemple : les changements disparaissent à la fermeture de la page. La base de données les gardera à l’étape suivante.</p>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var tt;function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},2800)}
+var K={"6e A":{tit:"M. Diakité",el:[["Camara Fatoumata","621 11 22 33"],["Diakité Mamadou","622 44 55 66"],["Keïta Aïssata","621 77 88 99"],["Traoré Ibrahima","628 10 20 30"],["Sylla Kadiatou","664 12 34 56"],["Condé Alpha","655 98 76 54"],["Bangoura Mariama","666 33 22 11"],["Touré Sory","620 55 44 33"]]},
+"7e A":{tit:"M. Bangoura",el:[["Soumah Fanta","620 21 21 21"],["Sidibé Lansana","621 31 31 31"],["Barry Hawa","622 41 41 41"],["Konaté Mohamed","628 51 51 51"],["Fofana Nènè","664 61 61 61"],["Cissé Oumar","655 71 71 71"]]}};
+var MOT=["Non justifiée","Maladie","Famille","Transport","Autre"];
+var R={};
+function seed(c,d,o){R[c+"|"+d]=K[c].el.map(function(_,i){return o[i]||{s:"P",h:"",m:""}})}
+seed("6e A","2026-11-09",{1:{s:"A",h:"",m:"Maladie"},3:{s:"R",h:"08:20",m:""}});
+seed("6e A","2026-11-10",{1:{s:"A",h:"",m:"Maladie"},4:{s:"A",h:"",m:"Non justifiée"}});
+seed("6e A","2026-11-12",{4:{s:"A",h:"",m:"Famille"},6:{s:"R",h:"08:45",m:""}});
+seed("7e A","2026-11-11",{2:{s:"A",h:"",m:"Non justifiée"}});
+var today=new Date().toISOString().slice(0,10);
+$("dt").value=today;$("dt").max=today;
+$("cl").innerHTML=Object.keys(K).map(function(c){return "<option>"+c+"</option>"}).join("");
+var D=[];
+function dfr(d){return d.split("-").reverse().join("/")}
+function load(){
+  var c=$("cl").value,d=$("dt").value,k=c+"|"+d;
+  D=R[k]?JSON.parse(JSON.stringify(R[k])):K[c].el.map(function(){return {s:"P",h:"",m:""}});
+  $("tit").textContent="Titulaire : "+K[c].tit+(R[k]?" – appel déjà enregistré pour cette date, vous pouvez le corriger":"");
+  $("sum").hidden=true;$("er").textContent="";rows();
+}
+function rows(){
+  var c=$("cl").value;
+  $("rows").innerHTML=K[c].el.map(function(e,i){var x=D[i];
+    var ex=x.s=="A"?'<select data-i="'+i+'" data-f="m" aria-label="Justification de '+esc(e[0])+'">'+MOT.map(function(m){return "<option"+(m==x.m?" selected":"")+">"+m+"</option>"}).join("")+"</select>":x.s=="R"?'<input type="time" data-i="'+i+'" data-f="h" value="'+x.h+'" aria-label="Heure d’arrivée de '+esc(e[0])+'">':"";
+    return '<div class="r"><b>'+esc(e[0])+'</b><div class="seg" role="group" aria-label="Présence de '+esc(e[0])+'"><button class="p" data-i="'+i+'" data-s="P" aria-pressed="'+(x.s=="P")+'">Présent</button><button class="a" data-i="'+i+'" data-s="A" aria-pressed="'+(x.s=="A")+'">Absent</button><button class="l" data-i="'+i+'" data-s="R" aria-pressed="'+(x.s=="R")+'">Retard</button></div><div class="ex">'+ex+"</div></div>"
+  }).join("");
+}
+$("rows").onclick=function(e){var b=e.target.closest("button[data-s]");if(!b)return;var i=+b.dataset.i,s=b.dataset.s;D[i]={s:s,h:"",m:s=="A"?"Non justifiée":""};rows()};
+$("rows").onchange=function(e){var t=e.target;if(!t.dataset.f)return;D[+t.dataset.i][t.dataset.f]=t.value};
+$("allp").onclick=function(){D=D.map(function(){return {s:"P",h:"",m:""}});$("sum").hidden=true;rows()};
+function tel(p){var d=p.replace(/\s/g,"");return d[0]=="+"?d:"+224"+d}
+function msg(n,d,kind,h){return "Bonjour, nous vous informons que "+n+" "+(kind=="A"?"était absent(e) de l’école le "+dfr(d)+".":"est arrivé(e) en retard à l’école le "+dfr(d)+" (à "+h+").")+" Groupe Scolaire Privé Wassolon Fondation."}
+$("sv").onclick=function(){
+  var c=$("cl").value,d=$("dt").value,e=$("er");e.textContent="";
+  if(!d){e.textContent="Choisissez la date de l’appel.";return}
+  if(d>today){e.textContent="La date ne peut pas être dans le futur.";return}
+  for(var i=0;i<D.length;i++){if(D[i].s=="R"&&!D[i].h){e.textContent="Indiquez l’heure d’arrivée de "+K[c].el[i][0]+".";return}}
+  R[c+"|"+d]=JSON.parse(JSON.stringify(D));
+  var p=0,a=0,l=0;D.forEach(function(x){if(x.s=="P")p++;else if(x.s=="A")a++;else l++});
+  var list=[];D.forEach(function(x,i){if(x.s!="P")list.push(i)});
+  $("sum").hidden=false;
+  $("sum").innerHTML='<h2>Appel du '+dfr(d)+" enregistré</h2><div class=\"chips\"><span class=\"chip p\">"+p+' présents</span><span class="chip a">'+a+' absents</span><span class="chip l">'+l+' en retard</span></div>'+(list.length?'<div class="sm">Prévenir les parents :</div>'+list.map(function(i){var x=D[i],e=K[c].el[i],t=msg(e[0],d,x.s,x.h);
+    return '<div class="par"><span><b>'+esc(e[0])+"</b> – "+(x.s=="A"?"absent"+(x.m&&x.m!="Non justifiée"?" ("+x.m.toLowerCase()+")":""):"retard à "+x.h)+'</span><span><a class="link" href="sms:'+tel(e[1])+"?body="+encodeURIComponent(t)+'">Envoyer un SMS</a><button class="link" data-c="'+i+'">Copier le message</button></span></div>'}).join(""):'<p class="sm">Tous les élèves sont présents : aucun message à envoyer.</p>');
+  $("sum").onclick=function(ev){var b=ev.target.closest("[data-c]");if(!b)return;var i=+b.dataset.c,x=D[i],t=msg(K[c].el[i][0],d,x.s,x.h);
+    try{navigator.clipboard.writeText(t).then(function(){toast("Message copié")},function(){toast("Copie impossible : sélectionnez le texte à la main.")})}catch(err){toast("Copie impossible sur cet appareil.")}};
+  toast("Appel enregistré");
+};
+function suivi(){
+  var c=$("cl").value,n=K[c].el.length,rows=K[c].el.map(function(e,i){return {n:e[0],a:0,j:0,r:0,d:[]}});
+  Object.keys(R).forEach(function(k){var p=k.split("|");if(p[0]!=c)return;R[k].forEach(function(x,i){if(!rows[i])return;if(x.s=="A"){rows[i].a++;if(x.m&&x.m!="Non justifiée")rows[i].j++;rows[i].d.push(p[1])}else if(x.s=="R")rows[i].r++})});
+  rows.sort(function(a,b){return b.a-a.a||b.r-a.r});
+  $("sb").innerHTML=rows.map(function(r){return "<tr><td>"+esc(r.n)+'</td><td class="n"><b>'+r.a+'</b></td><td class="n">'+r.j+'</td><td class="n">'+r.r+"</td><td>"+(r.d.length?r.d.sort().map(dfr).join(", "):'<span class="sm">Aucune</span>')+"</td></tr>"}).join("")
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){var t=b.dataset.t;$("pa").hidden=t!="a";$("ps").hidden=t!="s";$("dt").hidden=t!="a";document.querySelectorAll(".tabs button").forEach(function(x){x.setAttribute("aria-selected",x==b)});if(t=="s")suivi()}});
+$("cl").onchange=function(){load();if(!$("ps").hidden)suivi()};$("dt").onchange=load;
+load();
+</script>
+</body>
+</html>

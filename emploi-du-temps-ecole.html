@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Emploi du temps – Groupe Scolaire Privé Wassolon Fondation</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#ffffff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#1d4ed8;--brand2:#1e3a8a;--soft:#eef2ff;--pause:#f3f4f6;--off:#f9fafb;--err:#b91c1c;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0f172a;--card:#172036;--text:#f1f5f9;--muted:#94a3b8;--line:#263353;--brand:#3b82f6;--brand2:#172554;--soft:#1e2a47;--pause:#1b2540;--off:#131c33;--err:#fca5a5;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0f172a;--card:#172036;--text:#f1f5f9;--muted:#94a3b8;--line:#263353;--brand:#3b82f6;--brand2:#172554;--soft:#1e2a47;--pause:#1b2540;--off:#131c33;--err:#fca5a5;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:18px 24px}
+header small{display:block;color:#dbe4ff;font-size:13px}
+header h1{margin:0;font-size:22px}
+main{max-width:1000px;margin:0 auto;padding:18px 16px 40px}
+.ctl{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+select,input{padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);font:inherit}
+.ctl select{flex:1;min-width:150px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tabs button{border:0;background:none;color:var(--muted);padding:10px 14px;font:600 14px inherit;font-family:inherit;cursor:pointer;border-bottom:3px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--brand);border-bottom-color:var(--brand)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+.btn.sec{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+table.g{width:100%;min-width:720px;border-collapse:collapse;table-layout:fixed}
+table.g th,table.g td{border:1px solid var(--line);padding:0;vertical-align:top}
+table.g th{background:var(--soft);font-size:13px;padding:8px;text-align:center}
+table.g th.h{width:96px}
+td.hr{background:var(--soft);font-size:12px;text-align:center;padding:8px 4px;color:var(--muted)}
+td.hr b{display:block;color:var(--text);font-size:13px}
+td.pz{background:var(--pause);text-align:center;color:var(--muted);font-size:12px;padding:5px}
+td.off{background:var(--off)}
+.cell{display:block;width:100%;min-height:62px;padding:8px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.cell:hover{background:var(--soft)}
+.cell b{display:block;font-size:13px;line-height:1.25}
+.cell span{font-size:12px;color:var(--muted)}
+.cell.e{color:var(--muted);opacity:.5;text-align:center;font-size:20px}
+dialog{border:0;border-radius:14px;padding:0;width:min(420px,94vw);background:var(--card);color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+form{padding:20px}
+form h2{margin:0 0 2px;font-size:18px}
+.sm{color:var(--muted);font-size:13px}
+label{display:block;font-weight:600;font-size:13px;margin:12px 0 4px}
+form select{width:100%}
+.err{color:var(--err);font-size:13px;min-height:18px;margin-top:10px}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.acts .sp{flex:1}
+table.h2{width:100%;border-collapse:collapse;font-size:14px}
+table.h2 th,table.h2 td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+table.h2 th{color:var(--muted);font-size:13px;font-weight:600}
+.pad{padding:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5}
+.toast.show{opacity:1}
+.note{font-size:12px;color:var(--muted);margin-top:16px}
+#ptitle{display:none}
+@media (max-width:640px){header{padding:14px 16px}}
+@media print{
+  .np{display:none!important}
+  body{background:#fff;color:#000}
+  #ptitle{display:block;margin:0 0 10px}
+  .card{border:0;overflow:visible}
+  table.g{min-width:0}
+  :root{--soft:#eee;--pause:#f3f3f3;--muted:#444;--line:#888}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<a href="./" class="np-back" style="position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:10px;z-index:50;background:#fff;color:#1d4ed8;border:1px solid #cbd5e1;border-radius:8px;padding:6px 10px;font:600 13px system-ui,sans-serif;text-decoration:none">← Retour au menu</a><style>@media print{.np-back{display:none!important}}</style>
+<header class="np"><small>Groupe Scolaire Privé Wassolon Fondation, Kankan – 2026-2027</small><h1>Emploi du temps</h1></header>
+<main>
+  <div class="ctl np"><select id="cl" aria-label="Classe"></select><button class="btn sec" id="pr">Imprimer</button></div>
+  <div class="tabs np" role="tablist">
+    <button role="tab" data-t="g" aria-selected="true">Emploi du temps</button>
+    <button role="tab" data-t="h" aria-selected="false">Horaires</button>
+  </div>
+  <section id="pg">
+    <h2 id="ptitle"></h2>
+    <p class="sm np" style="margin:0 0 10px">Touchez une case pour choisir la matière et l’enseignant. Les horaires sont des exemples : modifiez-les dans l’onglet « Horaires ».</p>
+    <div class="card"><table class="g" id="grid"></table></div>
+  </section>
+  <section id="ph" class="card pad np" hidden>
+    <p class="sm" style="margin:0 0 12px">Les horaires ci-dessous sont des exemples. Changez les heures de début et de fin : tous les emplois du temps s’adaptent.</p>
+    <table class="h2"><thead><tr><th>Cours ou pause</th><th>Début</th><th>Fin</th></tr></thead><tbody id="hb"></tbody></table>
+    <div class="row"><button class="btn sec" id="ac">+ Ajouter un cours</button><button class="btn sec" id="rc">Retirer le dernier cours</button></div>
+    <div class="row"><label for="sat" style="margin:0">Le samedi, les cours s’arrêtent après</label><select id="sat"></select></div>
+    <div class="err" id="eh" role="alert"></div>
+  </section>
+  <p class="note np">Aperçu avec des données d’exemple : les changements disparaissent à la fermeture de la page. La base de données les gardera à l’étape suivante.</p>
+</main>
+
+<dialog id="dlg">
+  <form method="dialog" novalidate>
+    <h2 id="dt"></h2><div class="sm" id="ds"></div>
+    <label for="mt">Matière</label><select id="mt"></select>
+    <label for="en">Enseignant</label><select id="en"></select>
+    <div class="err" id="er" role="alert"></div>
+    <div class="acts"><button type="button" class="btn sec" id="cx">Vider la case</button><span class="sp"></span><button type="button" class="btn sec" id="cn">Annuler</button><button type="button" class="btn" id="sv">Enregistrer</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast"></div>
+<script>
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var tt;function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},2800)}
+var DAYS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+var CL=["1e","2e","3e","4e","5e","6e A","6e B","7e A","7e B","8e","9e","10e","11e","12e","Terminale"];
+var TE=[["M. Sidibé",["Français"]],["Mme Soumah",["Anglais"]],["M. Konaté",["Mathématiques"]],["Mme Fofana",["SVT","Sciences physiques"]],["M. Cissé",["Histoire-Géographie","Éducation civique"]],["M. Barry",["Mathématiques","Sciences physiques"]],["M. Bangoura",["EPS"]],["Mme Doumbouya",["Français","Éducation civique"]]];
+var MAT=["Français","Mathématiques","Anglais","Histoire-Géographie","Sciences physiques","SVT","EPS","Éducation civique"];
+var HRS={"Français":5,"Mathématiques":5,"Anglais":3,"Histoire-Géographie":3,"Sciences physiques":3,"SVT":2,"EPS":2,"Éducation civique":1};
+/* horaires d'exemple : liste de lignes {t:"c"|"p", a, b} */
+var H=[{t:"c",a:"07:30",b:"08:25"},{t:"c",a:"08:25",b:"09:20"},{t:"c",a:"09:20",b:"10:15"},{t:"p",l:"Récréation",a:"10:15",b:"10:35"},{t:"c",a:"10:35",b:"11:30"},{t:"c",a:"11:30",b:"12:25"},{t:"c",a:"12:25",b:"13:20"}];
+var SAT=4;
+function nc(){return H.filter(function(x){return x.t=="c"}).length}
+function mn(t){var p=t.split(":");return +p[0]*60+ +p[1]}
+function tm(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
+function hf(t){return t.replace(":","h")}
+var S={};/* S[classe][jour][n] = {m,t} */
+function cell(c,d,n){return S[c]&&S[c][d]?S[c][d][n]:null}
+function setCell(c,d,n,v){if(!S[c])S[c]={};if(!S[c][d])S[c][d]={};if(v)S[c][d][n]=v;else delete S[c][d][n]}
+function conflict(c,d,n,t){for(var k in S){if(k==c)continue;var x=S[k][d]&&S[k][d][n];if(x&&x.t==t)return k}return null}
+function limit(d){return d==5?SAT:nc()}
+function gen(c){
+  var q=[];MAT.forEach(function(m){for(var i=0;i<HRS[m];i++)q.push(m)});
+  var qi=0,order=[];for(var n=1;n<=nc();n++)for(var d=0;d<5;d++)order.push([d,n]);
+  for(var n2=1;n2<=SAT;n2++)order.push([5,n2]);
+  var rest=q.slice();
+  order.forEach(function(o){
+    for(var tries=0;tries<rest.length;tries++){
+      var m=rest[(qi+tries)%rest.length];var cand=[];
+      TE.forEach(function(t,i){if(t[1].indexOf(m)>-1&&!conflict(c,o[0],o[1],i))cand.push(i)});
+      if(cand.length){setCell(c,o[0],o[1],{m:m,t:cand[0]});rest.splice((qi+tries)%rest.length,1);qi=rest.length?(qi+1)%rest.length:0;return}
+    }
+  });
+}
+gen("8e");gen("9e");
+$("cl").innerHTML=CL.map(function(c){return "<option>"+c+"</option>"}).join("");
+$("cl").value="8e";
+function grid(){
+  var c=$("cl").value,n=0;
+  $("ptitle").textContent="Emploi du temps – Classe "+c+" – Groupe Scolaire Privé Wassolon Fondation";
+  var h='<thead><tr><th class="h">Horaire</th>'+DAYS.map(function(d){return "<th>"+d+"</th>"}).join("")+"</tr></thead><tbody>";
+  H.forEach(function(x){
+    if(x.t=="p"){h+='<tr><td class="hr">'+hf(x.a)+"<br>"+hf(x.b)+'</td><td class="pz" colspan="6">'+esc(x.l)+"</td></tr>";return}
+    n++;h+='<tr><td class="hr"><b>Cours '+n+"</b>"+hf(x.a)+" – "+hf(x.b)+"</td>";
+    for(var d=0;d<6;d++){
+      if(n>limit(d)){h+='<td class="off"></td>';continue}
+      var v=cell(c,d,n);
+      h+="<td>"+(v?'<button class="cell" data-d="'+d+'" data-n="'+n+'"><b>'+esc(v.m)+"</b><span>"+esc(TE[v.t][0])+"</span></button>":'<button class="cell e" data-d="'+d+'" data-n="'+n+'" aria-label="Ajouter un cours le '+DAYS[d].toLowerCase()+', cours '+n+'">+</button>')+"</td>"
+    }
+    h+="</tr>"
+  });
+  $("grid").innerHTML=h+"</tbody>";
+}
+var cd=0,cn=0;
+$("grid").onclick=function(e){var b=e.target.closest(".cell");if(!b)return;cd=+b.dataset.d;cn=+b.dataset.n;openD()};
+function fillEn(sel){
+  var m=$("mt").value;
+  var l=m?TE.map(function(t,i){return [t,i]}).filter(function(p){return p[0][1].indexOf(m)>-1}):[];
+  $("en").innerHTML=l.length?l.map(function(p){return '<option value="'+p[1]+'">'+esc(p[0][0])+"</option>"}).join(""):'<option value="">–</option>';
+  if(sel!=null&&sel!==""&&$("en").querySelector('[value="'+sel+'"]'))$("en").value=sel;
+}
+function openD(){
+  var c=$("cl").value,v=cell(c,cd,cn);
+  $("dt").textContent=DAYS[cd]+" – Cours "+cn;$("ds").textContent="Classe "+c+" – "+hf(slot(cn).a)+" à "+hf(slot(cn).b);
+  $("mt").innerHTML='<option value="">Choisir une matière</option>'+MAT.map(function(m){return "<option>"+m+"</option>"}).join("");
+  $("mt").value=v?v.m:"";fillEn(v?v.t:null);$("er").textContent="";$("dlg").showModal();
+}
+function slot(n){var k=0;for(var i=0;i<H.length;i++){if(H[i].t=="c"){k++;if(k==n)return H[i]}}}
+$("mt").onchange=function(){fillEn(null)};
+$("cn").onclick=function(){$("dlg").close()};
+$("cx").onclick=function(){setCell($("cl").value,cd,cn,null);$("dlg").close();grid();toast("Case vidée")};
+$("sv").onclick=function(){
+  var c=$("cl").value,m=$("mt").value,t=$("en").value,er=$("er");er.textContent="";
+  if(!m){er.textContent="Choisissez une matière.";return}
+  if(t===""){er.textContent="Aucun enseignant ne donne cette matière.";return}
+  var o=conflict(c,cd,cn,+t);
+  if(o){er.textContent=TE[t][0]+" a déjà cours avec la classe "+o+" à ce moment-là. Choisissez un autre enseignant ou un autre créneau.";return}
+  setCell(c,cd,cn,{m:m,t:+t});$("dlg").close();grid();toast("Case enregistrée");
+};
+function hor(){
+  var n=0;
+  $("hb").innerHTML=H.map(function(x,i){
+    var lab=x.t=="c"?"Cours "+(++n):esc(x.l);
+    return "<tr><td>"+lab+'</td><td><input type="time" data-i="'+i+'" data-k="a" value="'+x.a+'" aria-label="Début : '+lab+'"></td><td><input type="time" data-i="'+i+'" data-k="b" value="'+x.b+'" aria-label="Fin : '+lab+'"></td></tr>'
+  }).join("");
+  var o="";for(var k=1;k<=nc();k++)o+='<option value="'+k+'"'+(k==SAT?" selected":"")+">le cours "+k+"</option>";$("sat").innerHTML=o;
+}
+$("hb").onchange=function(e){
+  var el=e.target,i=+el.dataset.i,k=el.dataset.k,old=H[i][k],er=$("eh");er.textContent="";
+  var save=H[i][k];H[i][k]=el.value;
+  var bad="";
+  for(var j=0;j<H.length;j++){if(!H[j].a||!H[j].b){bad="Remplissez toutes les heures.";break}
+    if(mn(H[j].b)<=mn(H[j].a)){bad="La fin doit être après le début.";break}
+    if(j>0&&mn(H[j].a)<mn(H[j-1].b)){bad="Un cours ne peut pas commencer avant la fin du précédent.";break}}
+  if(bad){H[i][k]=save;el.value=save;er.textContent=bad;return}
+  toast("Horaire mis à jour");
+};
+$("ac").onclick=function(){var l=H[H.length-1],a=mn(l.b);H.push({t:"c",a:tm(a),b:tm(a+55)});hor();toast("Cours ajouté")};
+$("rc").onclick=function(){
+  if(nc()<=1){$("eh").textContent="Gardez au moins un cours.";return}
+  var last=H[H.length-1];if(last.t!="c"){$("eh").textContent="Le dernier élément est une pause : modifiez plutôt ses horaires.";return}
+  var n=nc();for(var c in S)for(var d in S[c])delete S[c][d][n];
+  H.pop();if(SAT>nc())SAT=nc();hor();$("eh").textContent="";toast("Dernier cours retiré")
+};
+$("sat").onchange=function(){SAT=+this.value;toast("Samedi : cours jusqu’au cours "+SAT)};
+document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){var t=b.dataset.t;$("pg").hidden=t!="g";$("ph").hidden=t!="h";document.querySelectorAll(".tabs button").forEach(function(x){x.setAttribute("aria-selected",x==b)});if(t=="h")hor();else grid()}});
+$("cl").onchange=grid;
+$("pr").onclick=function(){window.print()};
+grid();
+</script>
+</body>
+</html>

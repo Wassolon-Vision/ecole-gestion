@@ -30,7 +30,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 .side{width:230px;flex:none;background:linear-gradient(180deg,var(--brand),var(--brand2));color:#fff;display:flex;flex-direction:column;padding:16px 12px;position:sticky;top:0;height:100vh}
 .side .lg{display:flex;gap:10px;align-items:center;font-weight:700;padding:4px 8px 16px;font-size:13px;line-height:1.25}
 .side .lg b{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);font-size:13px;flex:none}
-.side nav{flex:1}
+.side nav{flex:1;overflow-y:auto}
 .side a,.side button{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;color:#e0e7ff;text-decoration:none;font:inherit;font-size:14px;background:none;border:0;cursor:pointer}
 .side a:hover,.side button:hover{background:rgba(255,255,255,.1)}
 .side a.on{background:#fff;color:var(--brand2);font-weight:600}
@@ -102,7 +102,10 @@ const firebaseConfig = {
   appId: "1:53849410080:web:96b2b733608ce833b78a45"
 };
 /* ===== fin de la configuration ===== */
-const DEMO=String(firebaseConfig.apiKey).startsWith("COLLER")||new URLSearchParams(location.search).has("demo");
+const QP=new URLSearchParams(location.search);
+if(QP.has("demo"))localStorage.setItem("demo-mode","1");
+if(QP.has("firebase"))localStorage.removeItem("demo-mode");
+const DEMO=String(firebaseConfig.apiKey).startsWith("COLLER")||localStorage.getItem("demo-mode")=="1";
 const V10="https://www.gstatic.com/firebasejs/10.12.2/";
 const FB=DEMO?demoLib():Object.assign({},await import(V10+"firebase-app.js"),await import(V10+"firebase-auth.js"),await import(V10+"firebase-firestore.js"));
 const {initializeApp,deleteApp,getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,getFirestore,doc,getDoc,updateDoc,collection,onSnapshot,runTransaction,serverTimestamp,writeBatch}=FB;
@@ -193,10 +196,12 @@ async function boot(u){
   $("boot").hidden=true;$("auth").hidden=true;$("app").hidden=false;
   $("sn").textContent=school.nom+(DEMO?" (démo)":"");$("me").textContent=me.nom+" – "+({direction:"Direction",enseignant:"Enseignant",parent:"Parent ou élève"}[me.role]||"");
   const nav=me.role=="parent"?[["me","🎓","Mon enfant"]]:me.role=="enseignant"?[["tb","📊","Tableau de bord"],["el","🎓","Élèves"]]:[["tb","📊","Tableau de bord"],["el","🎓","Élèves"],["pe","👥","Personnel"]];
-  $("nav").innerHTML=nav.map(n=>`<a href="#" data-v="${n[0]}">${n[1]} ${n[2]}</a>`).join("");
+  const PR=[["messages-ecole.html","✉️","Messages"],["classes-ecole.html","🏫","Classes"],["emploi-du-temps-ecole.html","🗓️","Emploi du temps"],["notes-bulletins-ecole.html","📝","Notes"],["appel-absences-ecole.html","✅","Appel et absences"],["discipline-ecole.html","⚖️","Discipline"],["reclamations-ecole.html","📣","Réclamations"],["enseignants-ecole.html","👩‍🏫","Enseignants"],["frais-scolarite-ecole.html","💰","Frais de scolarité"],["parametres-ecole.html","⚙️","Paramètres"]];
+  const pr=me.role=="parent"?[]:me.role=="enseignant"?PR.filter(p=>/messages|classes|emploi|notes|appel|discipline/.test(p[0])):PR;
+  $("nav").innerHTML=nav.map(n=>`<a href="#" data-v="${n[0]}">${n[1]} ${n[2]}</a>`).join("")+(pr.length?'<div class="me" style="padding:12px 12px 4px">Aperçus (données d’exemple)</div>'+pr.map(p=>`<a href="${p[0]}">${p[1]} ${p[2]}</a>`).join(""):"");
   go(me.role=="parent"?"me":"tb");
 }
-$("nav").onclick=e=>{const a=e.target.closest("a");if(!a)return;e.preventDefault();$("side").classList.remove("open");go(a.dataset.v)};
+$("nav").onclick=e=>{const a=e.target.closest("a");if(!a||!a.dataset.v)return;e.preventDefault();$("side").classList.remove("open");go(a.dataset.v)};
 $("out").onclick=()=>signOut(auth);
 
 /* ---------- vues ---------- */
@@ -310,7 +315,7 @@ function formStaff(){
 }
 /* ===== MODE DÉMONSTRATION (sans Firebase) : les données restent dans ce navigateur ===== */
 function demoBox(){
-  return '<div class="cred" style="font-size:13px;margin-top:16px"><b style="font-size:14px;letter-spacing:0">Mode démonstration</b> (sans Firebase)<br>Direction : 620 00 00 00 – demo123<br>Enseignant : 620 00 00 02 – demo123<br>Parent : WSF-2026-0001 – 123456<br><a href="#" id="rs">Réinitialiser</a> – <a href="#" id="rv">Démarrer à vide</a>'+(String(firebaseConfig.apiKey).startsWith("COLLER")?"":' – <a href="./">Utiliser Firebase</a>')+'</div>';
+  return '<div class="cred" style="font-size:13px;margin-top:16px"><b style="font-size:14px;letter-spacing:0">Mode démonstration</b> (sans Firebase)<br>Direction : 620 00 00 00 – demo123<br>Enseignant : 620 00 00 02 – demo123<br>Parent : WSF-2026-0001 – 123456<br><a href="#" id="rs">Réinitialiser</a> – <a href="#" id="rv">Démarrer à vide</a>'+(String(firebaseConfig.apiKey).startsWith("COLLER")?"":' – <a href="./?firebase">Utiliser Firebase</a>')+'</div>';
 }
 function bindDemo(){
   const go=v=>e=>{e.preventDefault();localStorage.removeItem("demo-user");if(v)localStorage.setItem("demo-db",JSON.stringify({d:{},a:{}}));else localStorage.removeItem("demo-db");location.reload()};

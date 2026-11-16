@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Discipline – Groupe Scolaire Privé Wassolon Fondation</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#ffffff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#1d4ed8;--brand2:#1e3a8a;--soft:#eef2ff;--ok:#15803d;--okbg:#dcfce7;--bad:#b91c1c;--badbg:#fee2e2;--warn:#b45309;--warnbg:#fef3c7;--err:#b91c1c;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0f172a;--card:#172036;--text:#f1f5f9;--muted:#94a3b8;--line:#263353;--brand:#3b82f6;--brand2:#172554;--soft:#1e2a47;--ok:#86efac;--okbg:#14391f;--bad:#fca5a5;--badbg:#451a1a;--warn:#fcd34d;--warnbg:#4a3410;--err:#fca5a5;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0f172a;--card:#172036;--text:#f1f5f9;--muted:#94a3b8;--line:#263353;--brand:#3b82f6;--brand2:#172554;--soft:#1e2a47;--ok:#86efac;--okbg:#14391f;--bad:#fca5a5;--badbg:#451a1a;--warn:#fcd34d;--warnbg:#4a3410;--err:#fca5a5;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:18px 24px}
+header small{display:block;color:#dbe4ff;font-size:13px}
+header h1{margin:0;font-size:22px}
+main{max-width:960px;margin:0 auto;padding:18px 16px 40px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.k span{color:var(--muted);font-size:13px}
+.k b{display:block;font-size:24px;line-height:1.3}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.bar input{flex:1;min-width:170px}
+select,input,textarea{padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+.btn.sec{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.btn.del{background:var(--card);color:var(--bad);border:1px solid var(--bad)}
+.count{color:var(--muted);font-size:13px;margin:0 0 10px}
+.list{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.r{display:grid;grid-template-columns:90px 1.2fr 1.6fr 1.3fr;gap:12px;align-items:start;padding:12px 16px;border:0;border-top:1px solid var(--line);width:100%;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.r:first-child{border-top:0}
+.r:hover{background:var(--soft)}
+.r b{display:block}
+.sm{color:var(--muted);font-size:13px}
+.bd{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;margin:0 4px 2px 0}
+.bd.i{background:var(--badbg);color:var(--bad)}.bd.f{background:var(--okbg);color:var(--ok)}.bd.s{background:var(--warnbg);color:var(--warn)}.bd.c{background:var(--soft);color:var(--brand)}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+dialog{border:0;border-radius:14px;padding:0;width:min(560px,95vw);background:var(--card);color:var(--text);max-height:94vh}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.dl{padding:20px}
+.dl h2{margin:0 0 4px;font-size:18px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.g .w{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:13px;margin:12px 0 4px}
+.g select,.g input,.g textarea{width:100%}
+textarea{min-height:70px;resize:vertical}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--card);color:var(--muted);padding:9px 6px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"].i{background:var(--badbg);color:var(--bad)}
+.seg button[aria-pressed="true"].f{background:var(--okbg);color:var(--ok)}
+.err{color:var(--err);font-size:13px;min-height:18px;margin-top:10px}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.acts .sp{flex:1}
+.det p{margin:6px 0}
+.hist{margin-top:12px;padding:10px 12px;background:var(--soft);border-radius:10px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5}
+.toast.show{opacity:1}
+.note{font-size:12px;color:var(--muted);margin-top:16px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.r{grid-template-columns:1fr}.g{grid-template-columns:1fr}header{padding:14px 16px}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<a href="./" class="np-back" style="position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:10px;z-index:50;background:#fff;color:#1d4ed8;border:1px solid #cbd5e1;border-radius:8px;padding:6px 10px;font:600 13px system-ui,sans-serif;text-decoration:none">← Retour au menu</a><style>@media print{.np-back{display:none!important}}</style>
+<header><small>Groupe Scolaire Privé Wassolon Fondation, Kankan – 2026-2027</small><h1>Discipline</h1></header>
+<main>
+  <section class="cards" id="cards"></section>
+  <div class="bar">
+    <input id="q" type="search" placeholder="Chercher un élève" aria-label="Chercher un élève">
+    <select id="ft" aria-label="Nature"><option value="">Tout</option><option value="I">Incidents et sanctions</option><option value="F">Félicitations et encouragements</option></select>
+    <select id="fc" aria-label="Classe"></select>
+    <button class="btn" id="add">+ Nouvelle note</button>
+  </div>
+  <p class="count" id="count"></p>
+  <div class="list" id="list"></div>
+  <p class="note">Aperçu avec des données d’exemple : les changements disparaissent à la fermeture de la page. La base de données les gardera à l’étape suivante.</p>
+</main>
+
+<dialog id="dlg"><div class="dl" id="dl"></div></dialog>
+<div class="toast" id="toast"></div>
+<script>
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var tt;function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},2800)}
+var today=new Date().toISOString().slice(0,10);
+function dfr(d){return d?d.split("-").reverse().join("/"):""}
+function addDays(d,n){var x=new Date(d+"T00:00:00Z");x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)}
+var EL=[["Camara Fatoumata","1e"],["Diakité Mamadou","3e"],["Keïta Aïssata","6e A"],["Traoré Ibrahima","7e A"],["Sylla Kadiatou","9e"],["Condé Alpha","11e"],["Bangoura Mariama","12e"],["Touré Sory","Terminale"],["Soumah Fanta","7e B"],["Sidibé Lansana","8e"]];
+var CL=["1e","2e","3e","4e","5e","6e A","6e B","7e A","7e B","8e","9e","10e","11e","12e","Terminale"];
+var PAR=["M. Sidibé","Mme Soumah","M. Konaté","Mme Fofana","M. Cissé","M. Barry","M. Bangoura","Mme Doumbouya","Direction"];
+var CAT_I=["Retards répétés","Bavardage ou chahut","Insolence","Violence ou bagarre","Fraude ou triche","Tenue non conforme","Téléphone en classe","Autre"];
+var CAT_F=["Félicitations","Encouragements"];
+var SAN=["Avertissement","Blâme","Retenue","Exclusion temporaire","Convocation des parents","Conseil de discipline"];
+function R(e,d,t,c,s,x,p,desc){return {e:e,d:d,t:t,c:c,s:s,x:x,p:p,desc:desc}}
+var D=[
+R(3,"2026-11-03","I","Retards répétés","Avertissement",{},"M. Sidibé","Troisième retard de la semaine, arrivé après 8h."),
+R(1,"2026-11-05","I","Bavardage ou chahut","Retenue",{h:2},"M. Konaté","Perturbe le cours de mathématiques malgré deux rappels."),
+R(6,"2026-11-06","I","Insolence","Blâme",{},"M. Cissé","Réponse irrespectueuse à l’enseignant."),
+R(5,"2026-11-09","I","Violence ou bagarre","Exclusion temporaire",{j:3,deb:"2026-11-12"},"Direction","Bagarre dans la cour avec un camarade."),
+R(5,"2026-11-10","I","Violence ou bagarre","Convocation des parents",{dc:"2026-11-18"},"Direction","Parents convoqués suite à la bagarre."),
+R(0,"2026-11-04","F","Félicitations","",{},"Mme Doumbouya","Excellents résultats en français ce trimestre."),
+R(7,"2026-11-11","F","Encouragements","",{},"M. Barry","Gros progrès en mathématiques, à continuer."),
+R(8,"2026-11-12","F","Félicitations","",{},"Mme Soumah","Très bonne participation en anglais.")
+];
+function detail(r){
+  if(r.t=="F")return "";
+  if(r.s=="Retenue")return "Retenue : "+r.x.h+" h";
+  if(r.s=="Exclusion temporaire")return "Exclusion : "+r.x.j+" jour"+(r.x.j>1?"s":"")+" à partir du "+dfr(r.x.deb);
+  if(r.s=="Convocation des parents")return "Parents convoqués le "+dfr(r.x.dc);
+  if(r.s=="Conseil de discipline")return "Conseil de discipline le "+dfr(r.x.dc);
+  return "";
+}
+function excl(r){return r.s=="Exclusion temporaire"&&r.x.deb<=today&&addDays(r.x.deb,r.x.j-1)>=today}
+$("fc").innerHTML='<option value="">Toutes les classes</option>'+CL.map(function(c){return "<option>"+c+"</option>"}).join("");
+function render(){
+  var inc=D.filter(function(r){return r.t=="I"}).length,fel=D.length-inc,ex=D.filter(excl).length;
+  var els={};D.forEach(function(r){if(r.t=="I")els[r.e]=1});
+  $("cards").innerHTML=[["Incidents",inc],["Félicitations",fel],["Élèves sanctionnés",Object.keys(els).length],["Exclusions en cours",ex]].map(function(x){return '<div class="k"><span>'+x[0]+"</span><b>"+x[1]+"</b></div>"}).join("");
+  var q=$("q").value.trim().toLowerCase(),ft=$("ft").value,fc=$("fc").value;
+  var l=D.map(function(r,i){r.i=i;return r}).filter(function(r){return (!ft||r.t==ft)&&(!fc||EL[r.e][1]==fc)&&(!q||EL[r.e][0].toLowerCase().indexOf(q)>-1)}).sort(function(a,b){return b.d.localeCompare(a.d)});
+  $("count").textContent=l.length+" note"+(l.length>1?"s":"")+" sur "+D.length;
+  $("list").innerHTML=l.length?l.map(function(r){
+    return '<button class="r" data-i="'+r.i+'"><span class="sm">'+dfr(r.d)+'</span><span><b>'+esc(EL[r.e][0])+'</b><span class="sm">Classe '+esc(EL[r.e][1])+'</span></span><span><span class="bd '+(r.t=="I"?"i":"f")+'">'+esc(r.c)+"</span>"+(r.s?'<span class="bd s">'+esc(r.s)+"</span>":"")+(excl(r)?'<span class="bd i">En cours</span>':"")+'<br><span class="sm">'+esc(detail(r)||r.desc)+'</span></span><span class="sm">Signalé par '+esc(r.p)+"</span></button>"
+  }).join(""):'<div class="empty">Aucune note ne correspond. Changez la recherche ou les filtres.</div>';
+}
+["q","ft","fc"].forEach(function(k){$(k).oninput=render});
+$("list").onclick=function(e){var b=e.target.closest(".r");if(b)show(+b.dataset.i)};
+var cur=-1,sure=false,kind="I";
+function show(i){
+  cur=i;sure=false;var r=D[i],n=D.filter(function(x){return x.e==r.e}),a=n.filter(function(x){return x.t=="I"}).length;
+  $("dl").innerHTML='<div class="det"><h2>'+esc(EL[r.e][0])+'</h2><div class="sm">Classe '+esc(EL[r.e][1])+" – "+dfr(r.d)+'</div><p><span class="bd '+(r.t=="I"?"i":"f")+'">'+esc(r.c)+"</span>"+(r.s?'<span class="bd s">'+esc(r.s)+"</span>":"")+"</p>"+(detail(r)?"<p><b>"+esc(detail(r))+"</b></p>":"")+"<p>"+esc(r.desc)+'</p><p class="sm">Signalé par '+esc(r.p)+'</p><div class="hist">Historique de l’élève : '+a+" incident"+(a>1?"s":"")+", "+(n.length-a)+" félicitation"+(n.length-a>1?"s":"")+'.</div></div><div class="acts"><button class="btn del" id="rm">Supprimer cette note</button><span class="sp"></span><button class="btn sec" id="cl">Fermer</button></div>';
+  $("cl").onclick=function(){$("dlg").close()};
+  $("rm").onclick=function(){if(!sure){sure=true;this.textContent="Confirmer la suppression";return}D.splice(cur,1);$("dlg").close();render();toast("Note supprimée")};
+  $("dlg").showModal();
+}
+function form(){
+  var inc=kind=="I";
+  $("dl").innerHTML='<h2>Nouvelle note</h2><div class="g"><div class="w"><label>Nature</label><div class="seg"><button type="button" class="i" data-k="I" aria-pressed="'+inc+'">Incident ou sanction</button><button type="button" class="f" data-k="F" aria-pressed="'+!inc+'">Félicitations</button></div></div>'
+  +'<div><label for="fe">Élève</label><select id="fe"><option value="">Choisir</option>'+EL.map(function(e,i){return '<option value="'+i+'">'+esc(e[0])+" ("+e[1]+")</option>"}).join("")+'</select></div><div><label for="fd">Date</label><input id="fd" type="date" max="'+today+'" value="'+today+'"></div>'
+  +'<div><label for="fcat">'+(inc?"Motif":"Type")+'</label><select id="fcat">'+(inc?CAT_I:CAT_F).map(function(c){return "<option>"+c+"</option>"}).join("")+"</select></div>"
+  +(inc?'<div><label for="fs">Sanction</label><select id="fs">'+SAN.map(function(s){return "<option>"+s+"</option>"}).join("")+'</select></div><div class="w" id="ex"></div>':"")
+  +'<div class="w"><label for="fx">Description</label><textarea id="fx" placeholder="Que s’est-il passé ?"></textarea></div><div class="w"><label for="fp">Signalé par</label><select id="fp">'+PAR.map(function(p){return "<option>"+p+"</option>"}).join("")+'</select></div></div><div class="err" id="er" role="alert"></div><div class="acts"><button type="button" class="btn sec" id="cn">Annuler</button><button type="button" class="btn" id="sv">Enregistrer</button></div>';
+  if(inc){$("fs").onchange=extra;extra()}
+  $("cn").onclick=function(){$("dlg").close()};
+  $("sv").onclick=save;
+  document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(){kind=b.dataset.k;form()}});
+}
+function extra(){
+  var s=$("fs").value,h="";
+  if(s=="Retenue")h='<label for="x1">Nombre d’heures (1 à 8)</label><input id="x1" type="number" min="1" max="8" value="2">';
+  else if(s=="Exclusion temporaire")h='<div class="g"><div><label for="x1">Nombre de jours (1 à 15)</label><input id="x1" type="number" min="1" max="15" value="3"></div><div><label for="x2">Premier jour d’exclusion</label><input id="x2" type="date" value="'+today+'"></div></div>';
+  else if(s=="Convocation des parents"||s=="Conseil de discipline")h='<label for="x2">Date de '+(s=="Conseil de discipline"?"réunion":"convocation")+'</label><input id="x2" type="date" value="'+addDays(today,3)+'">';
+  $("ex").innerHTML=h;
+}
+$("add").onclick=function(){kind="I";form();$("dlg").showModal()};
+function save(){
+  var er=$("er");er.textContent="";var inc=kind=="I",e=$("fe").value,d=$("fd").value,x=$("fx").value.trim();
+  if(e===""){er.textContent="Choisissez l’élève.";return}
+  if(!d||d>today){er.textContent="Choisissez une date qui n’est pas dans le futur.";return}
+  if(x.length<5){er.textContent="Décrivez brièvement ce qui s’est passé.";return}
+  var s="",o={};
+  if(inc){s=$("fs").value;
+    if(s=="Retenue"){var h=parseInt($("x1").value,10);if(!(h>=1&&h<=8)){er.textContent="La retenue dure entre 1 et 8 heures.";return}o={h:h}}
+    if(s=="Exclusion temporaire"){var j=parseInt($("x1").value,10);if(!(j>=1&&j<=15)){er.textContent="L’exclusion dure entre 1 et 15 jours.";return}if(!$("x2").value){er.textContent="Indiquez le premier jour d’exclusion.";return}o={j:j,deb:$("x2").value}}
+    if(s=="Convocation des parents"||s=="Conseil de discipline"){if(!$("x2").value){er.textContent="Indiquez la date.";return}o={dc:$("x2").value}}}
+  D.push(R(+e,d,kind,$("fcat").value,s,o,$("fp").value,x));
+  $("dlg").close();render();toast("Note enregistrée");
+}
+render();
+</script>
+</body>
+</html>
