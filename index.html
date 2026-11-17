@@ -80,6 +80,11 @@ dialog::backdrop{background:rgba(0,0,0,.5)}
   .g2{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){.side,.toast{transition:none}}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.cc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.cc h3{margin:0;font-size:18px}
+.pb{height:8px;background:var(--soft);border-radius:4px;overflow:hidden;margin:6px 0}
+.pb span{display:block;height:100%;background:#15803d}.pb span.w{background:#b45309}.pb span.f{background:var(--err)}
 </style>
 </head>
 <body>
@@ -119,7 +124,7 @@ let tt;const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("show"
 const frErr=e=>({"auth/invalid-credential":"Identifiant ou mot de passe incorrect.","auth/wrong-password":"Identifiant ou mot de passe incorrect.","auth/user-not-found":"Identifiant ou mot de passe incorrect.","auth/invalid-email":"Identifiant non valide.","auth/too-many-requests":"Trop d’essais. Attendez quelques minutes.","auth/network-request-failed":"Pas de connexion Internet.","auth/email-already-in-use":"Ce compte existe déjà.","auth/weak-password":"Le mot de passe doit avoir au moins 6 caractères.","permission-denied":"Action non autorisée.","auth/operation-not-allowed":"La connexion par e-mail et mot de passe n’est pas activée dans Firebase."}[e.code]||"Une erreur est survenue ("+(e.code||e.message)+").");
 
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-let me=null,school=null,students=[],users=[],unsub=[],setting=false,view="",armed="";
+let me=null,school=null,students=[],users=[],classes=[],unsub=[],setting=false,view="",armed="";
 
 /* ---------- identifiants ---------- */
 const email=(id,parent)=>{
@@ -192,13 +197,14 @@ async function boot(u){
   me={uid:u.uid,...s.data()};
   if(!school){const c=await getDoc(doc(db,"config","ecole"));school=c.exists()?c.data():{nom:"École",niveaux:LV}}
   unsub.forEach(f=>f());unsub=[];
-  if(me.role!="parent")unsub.push(onSnapshot(collection(db,"students"),q=>{students=q.docs.map(d=>({id:d.id,...d.data()}));if(view=="tb"||view=="el")go(view)},()=>{}));
+  if(me.role!="parent")unsub.push(onSnapshot(collection(db,"students"),q=>{students=q.docs.map(d=>({id:d.id,...d.data()}));if(view=="tb"||view=="el"||view=="cl")go(view)},()=>{}));
+  if(me.role!="parent")unsub.push(onSnapshot(collection(db,"classes"),q=>{classes=q.docs.map(d=>({id:d.id,...d.data()}));if(view=="cl"||view=="el")go(view)},()=>{}));
   if(me.role=="direction")unsub.push(onSnapshot(collection(db,"users"),q=>{users=q.docs.map(d=>({id:d.id,...d.data()}));if(view=="pe")go("pe")},()=>{}));
   $("boot").hidden=true;$("auth").hidden=true;$("app").hidden=false;
   $("sn").textContent=school.nom+(DEMO?" (démo)":"");$("me").textContent=me.nom+" – "+({direction:"Direction",enseignant:"Enseignant",parent:"Parent ou élève"}[me.role]||"");
-  const nav=me.role=="parent"?[["me","🎓","Mon enfant"]]:me.role=="enseignant"?[["tb","📊","Tableau de bord"],["el","🎓","Élèves"]]:[["tb","📊","Tableau de bord"],["el","🎓","Élèves"],["pe","👥","Personnel"]];
-  const PR=[["messages-ecole.html","✉️","Messages"],["classes-ecole.html","🏫","Classes"],["emploi-du-temps-ecole.html","🗓️","Emploi du temps"],["notes-bulletins-ecole.html","📝","Notes"],["appel-absences-ecole.html","✅","Appel et absences"],["discipline-ecole.html","⚖️","Discipline"],["reclamations-ecole.html","📣","Réclamations"],["enseignants-ecole.html","👩‍🏫","Enseignants"],["frais-scolarite-ecole.html","💰","Frais de scolarité"],["parametres-ecole.html","⚙️","Paramètres"]];
-  const pr=me.role=="parent"?[]:me.role=="enseignant"?PR.filter(p=>/messages|classes|emploi|notes|appel|discipline/.test(p[0])):PR;
+  const nav=me.role=="parent"?[["me","🎓","Mon enfant"]]:me.role=="enseignant"?[["tb","📊","Tableau de bord"],["el","🎓","Élèves"],["cl","🏫","Classes"]]:[["tb","📊","Tableau de bord"],["el","🎓","Élèves"],["cl","🏫","Classes"],["pe","👥","Personnel"]];
+  const PR=[["messages-ecole.html","✉️","Messages"],["emploi-du-temps-ecole.html","🗓️","Emploi du temps"],["notes-bulletins-ecole.html","📝","Notes"],["appel-absences-ecole.html","✅","Appel et absences"],["discipline-ecole.html","⚖️","Discipline"],["reclamations-ecole.html","📣","Réclamations"],["enseignants-ecole.html","👩‍🏫","Enseignants"],["frais-scolarite-ecole.html","💰","Frais de scolarité"],["parametres-ecole.html","⚙️","Paramètres"]];
+  const pr=me.role=="parent"?[]:me.role=="enseignant"?PR.filter(p=>/messages|emploi|notes|appel|discipline/.test(p[0])):PR;
   $("nav").innerHTML=nav.map(n=>`<a href="#" data-v="${n[0]}">${n[1]} ${n[2]}</a>`).join("")+(pr.length?'<div class="me" style="padding:12px 12px 4px">Aperçus (données d’exemple)</div>'+pr.map(p=>`<a href="${p[0]}">${p[1]} ${p[2]}</a>`).join(""):"");
   go(me.role=="parent"?"me":"tb");
 }
@@ -234,8 +240,22 @@ function lst(){
   const dir=me.role=="direction",q=qs.trim().toLowerCase();
   const l=students.filter(s=>(!lf||s.niveau==lf)&&(!q||(s.nom+" "+s.pre+" "+s.matricule).toLowerCase().includes(q))).sort((a,b)=>(a.nom+a.pre).localeCompare(b.nom+b.pre));
   $("ct").textContent=l.length+" élève"+(l.length>1?"s":"")+" sur "+students.length;
-  $("lst").innerHTML=l.length?l.map(s=>`<div class="it"><div><b>${esc(s.pre+" "+s.nom)}</b><span class="sm">${esc(s.matricule)} – ${esc(s.sx)}</span></div><div>${esc(s.niveau)}<br><span class="sm">Né(e) le ${esc((s.dn||"").split("-").reverse().join("/"))}</span></div><div class="sm">${esc(s.pn||"")}<br>${esc(s.pt||"")}</div>${dir?`<div class="acts"><button class="btn sec" data-a="code" data-id="${s.id}">Code</button><button class="btn del" data-a="del" data-id="${s.id}">${armed==s.id?"Confirmer":"Supprimer"}</button></div>`:"<span></span>"}</div>`).join(""):'<div class="empty">Aucun élève. '+(dir?"Touchez « Nouvel élève » pour en ajouter.":"")+"</div>";
+  $("lst").innerHTML=l.length?l.map(s=>`<div class="it"><div><b>${esc(s.pre+" "+s.nom)}</b><span class="sm">${esc(s.matricule)} – ${esc(s.sx)}</span></div><div>${esc(s.classe||s.niveau)}<br><span class="sm">Né(e) le ${esc((s.dn||"").split("-").reverse().join("/"))}</span></div><div class="sm">${esc(s.pn||"")}<br>${esc(s.pt||"")}</div>${dir?`<div class="acts"><button class="btn sec" data-a="code" data-id="${s.id}">Code</button><button class="btn del" data-a="del" data-id="${s.id}">${armed==s.id?"Confirmer":"Supprimer"}</button></div>`:"<span></span>"}</div>`).join(""):'<div class="empty">Aucun élève. '+(dir?"Touchez « Nouvel élève » pour en ajouter.":"")+"</div>";
 }
+
+let cf="";
+const inClass=c=>students.filter(s=>s.classe?s.classe==c.nom:(s.niveau==c.niveau&&classes.filter(x=>x.niveau==c.niveau).length==1));
+V.cl=()=>{
+  const dir=me.role=="direction",lv=school.niveaux||LV;
+  const l=classes.filter(c=>!cf||c.niveau==cf).sort((a,b)=>lv.indexOf(a.niveau)-lv.indexOf(b.niveau)||a.nom.localeCompare(b.nom));
+  const tot=l.reduce((n,c)=>n+inClass(c).length,0);
+  $("main").innerHTML=head("Classes",dir?'<button class="btn" data-a="newcl">+ Nouvelle classe</button>':"")+
+  `<div class="tools"><select id="cfl" aria-label="Niveau"><option value="">Tous les niveaux</option>${lv.map(x=>`<option${x==cf?" selected":""}>${x}</option>`).join("")}</select></div><p class="sm">${l.length} classe${l.length>1?"s":""} – ${tot} élève${tot>1?"s":""}</p>
+  <div class="cgrid">${l.map(c=>{const m=inClass(c),g=m.filter(s=>s.sx=="Garçon").length,f=m.length-g,p=Math.min(100,Math.round(m.length/c.capacite*100)),k=p>=100?"f":p>=85?"w":"";
+    return `<div class="cc"><h3>${esc(c.nom)}</h3><div class="sm">Titulaire : ${c.titulaire?esc(c.titulaire):"à désigner"}</div><div style="margin-top:8px"><b style="font-size:22px">${m.length}</b> <span class="sm">/ ${c.capacite}</span></div><div class="pb"><span class="${k}" style="width:${p}%"></span></div><div class="sm">${g} garçons – ${f} filles${p>=100?" – classe pleine":""}</div>${dir?`<div class="acts" style="margin-top:10px"><button class="btn sec" data-a="editcl" data-id="${c.id}">Modifier</button><button class="btn del" data-a="delcl" data-id="${c.id}">${armed==c.id?"Confirmer":"Supprimer"}</button></div>`:""}</div>`}).join("")||'<div class="empty" style="grid-column:1/-1">Aucune classe. '+(dir?"Touchez « Nouvelle classe » pour en créer.":"")+"</div>"}</div>`;
+  $("cfl").onchange=e=>{cf=e.target.value;V.cl()};
+  bindBurger();
+};
 
 V.pe=()=>{
   const l=users.filter(u=>u.role!="parent").sort((a,b)=>a.nom.localeCompare(b.nom));
@@ -250,7 +270,7 @@ V.me=async()=>{
     const s=await getDoc(doc(db,"students",me.eleveId));
     if(!s.exists()){$("main").innerHTML=head("Mon enfant")+'<div class="panel">Fiche introuvable. Contactez la direction.</div>';bindBurger();return}
     const d=s.data(),r=(a,b)=>`<div class="row" style="grid-template-columns:160px 1fr"><div class="t" style="text-align:left">${a}</div><div>${esc(b||"–")}</div></div>`;
-    $("main").innerHTML=head(esc(d.pre+" "+d.nom))+`<div class="panel">${r("Matricule",d.matricule)}${r("Classe",d.niveau)}${r("Sexe",d.sx)}${r("Date de naissance",(d.dn||"").split("-").reverse().join("/"))}${r("Lieu de naissance",d.ln)}${r("Adresse",d.ad)}${r("Ancienne école",d.ec)}${r("Parent ou tuteur",d.pn)}${r("Téléphone du parent",d.pt)}</div><p class="sm">Les notes, les absences et les frais seront ajoutés prochainement.</p>`;
+    $("main").innerHTML=head(esc(d.pre+" "+d.nom))+`<div class="panel">${r("Matricule",d.matricule)}${r("Classe",d.classe||d.niveau)}${r("Sexe",d.sx)}${r("Date de naissance",(d.dn||"").split("-").reverse().join("/"))}${r("Lieu de naissance",d.ln)}${r("Adresse",d.ad)}${r("Ancienne école",d.ec)}${r("Parent ou tuteur",d.pn)}${r("Téléphone du parent",d.pt)}</div><p class="sm">Les notes, les absences et les frais seront ajoutés prochainement.</p>`;
     bindBurger();
   }catch(e){$("main").innerHTML=head("Mon enfant")+'<div class="panel">'+esc(frErr(e))+"</div>";bindBurger()}
 };
@@ -262,6 +282,13 @@ $("main").onclick=async e=>{
   const b=e.target.closest("button[data-a]");if(!b)return;const a=b.dataset.a,id=b.dataset.id;
   if(a=="new")return formEl();
   if(a=="staff")return formStaff();
+  if(a=="newcl")return formCl();
+  if(a=="editcl")return formCl(id);
+  if(a=="delcl"){
+    const c=classes.find(x=>x.id==id);
+    if(inClass(c).length){toast("Cette classe contient des élèves : déplacez-les d’abord.");return}
+    if(armed!=id){armed=id;return V.cl()}
+    try{const w=writeBatch(db);w.delete(doc(db,"classes",id));await w.commit();armed="";toast("Classe supprimée")}catch(x){toast(frErr(x))}return}
   if(a=="code"){
     try{const c=await getDoc(doc(db,"codes",id));const who=b.dataset.u?users.find(u=>u.id==id):students.find(s=>s.id==id);
       modal(`<h2>${b.dataset.u?"Mot de passe":"Code d’accès"}</h2><div class="cred">${b.dataset.u?"Identifiant : ":"Matricule : "}<b>${esc(b.dataset.u?(who&&who.identifiant):(who&&who.matricule))}</b><br>${b.dataset.u?"Mot de passe":"Code"} : <b>${c.exists()?esc(c.data().code):"non conservé"}</b></div><div class="dacts"><button class="btn" id="x">Fermer</button></div>`);$("x").onclick=closeM}
@@ -275,7 +302,7 @@ $("main").onclick=async e=>{
 function formEl(){
   modal(`<h2>Nouvel élève</h2><div class="g2">
   <div><label for="f1">Nom</label><input id="f1"></div><div><label for="f2">Prénom</label><input id="f2"></div>
-  <div><label for="f3">Sexe</label><select id="f3"><option value="">Choisir</option><option>Garçon</option><option>Fille</option></select></div><div><label for="f4">Classe</label><select id="f4"><option value="">Choisir</option>${(school.niveaux||LV).map(l=>`<option>${l}</option>`).join("")}</select></div>
+  <div><label for="f3">Sexe</label><select id="f3"><option value="">Choisir</option><option>Garçon</option><option>Fille</option></select></div><div><label for="f4">Classe</label><select id="f4"><option value="">Choisir</option>${classes.length?classes.slice().sort((a,b)=>(school.niveaux||LV).indexOf(a.niveau)-(school.niveaux||LV).indexOf(b.niveau)||a.nom.localeCompare(b.nom)).map(c=>`<option value="${esc(c.nom)}" data-n="${esc(c.niveau)}">${esc(c.nom)}</option>`).join(""):(school.niveaux||LV).map(l=>`<option value="${l}" data-n="${l}">${l}</option>`).join("")}</select></div>
   <div><label for="f5">Date de naissance</label><input id="f5" type="date"></div><div><label for="f6">Lieu de naissance</label><input id="f6"></div>
   <div class="w"><label for="f7">Adresse</label><input id="f7"></div><div class="w"><label for="f8">Ancienne école fréquentée</label><input id="f8"></div>
   <div><label for="f9">Nom du parent ou tuteur</label><input id="f9"></div><div><label for="f10">Téléphone du parent</label><input id="f10" type="tel" inputmode="tel"></div></div>
@@ -287,14 +314,35 @@ function formEl(){
     if(v("f5")>new Date().toISOString().slice(0,10)){e.textContent="La date de naissance ne peut pas être dans le futur.";return}
     $("s1").disabled=true;
     try{
+      const o=$("f4").selectedOptions[0];
       const n=await runTransaction(db,async t=>{const r=doc(db,"config","compteur"),s=await t.get(r),k=(s.exists()?s.data().n:0)+1;t.set(r,{n:k});return k});
       const mat="WSF-"+String(school.annee||"2026").slice(0,4)+"-"+String(n).padStart(4,"0"),code=genCode();
       const uid=await mkUser(email(mat,true),code),ref=doc(collection(db,"students")),w=writeBatch(db);
-      w.set(ref,{matricule:mat,nom:v("f1"),pre:v("f2"),sx:v("f3"),niveau:v("f4"),dn:v("f5"),ln:v("f6"),ad:v("f7"),ec:v("f8"),pn:v("f9"),pt:v("f10"),uid,cree:serverTimestamp()});
+      w.set(ref,{matricule:mat,nom:v("f1"),pre:v("f2"),sx:v("f3"),niveau:o.dataset.n,classe:classes.length?v("f4"):"",dn:v("f5"),ln:v("f6"),ad:v("f7"),ec:v("f8"),pn:v("f9"),pt:v("f10"),uid,cree:serverTimestamp()});
       w.set(doc(db,"users",uid),{nom:v("f9")||v("f2")+" "+v("f1"),role:"parent",eleveId:ref.id,actif:true,identifiant:mat});
       w.set(doc(db,"codes",ref.id),{code});
       await w.commit();
       modal(`<h2>Élève inscrit</h2><p>${esc(v("f2")+" "+v("f1"))} est inscrit(e). Remettez ces informations au parent :</p><div class="cred">Matricule : <b>${mat}</b><br>Code : <b>${code}</b></div><p class="sm">Vous pourrez revoir le code avec le bouton « Code » de la liste des élèves.</p><div class="dacts"><button class="btn" id="x">Fermer</button></div>`);$("x").onclick=closeM;
+    }catch(x){$("s1").disabled=false;e.textContent=frErr(x)}
+  };
+}
+
+function formCl(id){
+  const c=id?classes.find(x=>x.id==id):{nom:"",niveau:"",titulaire:"",capacite:40},lv=school.niveaux||LV;
+  modal(`<h2>${id?"Modifier la classe":"Nouvelle classe"}</h2><label for="k1">Niveau</label><select id="k1"><option value="">Choisir</option>${lv.map(l=>`<option${l==c.niveau?" selected":""}>${l}</option>`).join("")}</select><label for="k2">Nom de la classe</label><input id="k2" value="${esc(c.nom)}" placeholder="Ex. 6e A"><div class="g2"><div><label for="k3">Titulaire</label><input id="k3" value="${esc(c.titulaire||"")}"></div><div><label for="k4">Capacité</label><input id="k4" type="number" min="1" value="${c.capacite}"></div></div><div class="err" id="fe" role="alert"></div><div class="dacts"><button class="btn sec" id="c1">Annuler</button><button class="btn" id="s1">Enregistrer</button></div>`);
+  $("c1").onclick=closeM;
+  $("k1").onchange=()=>{if(!id&&!$("k2").value.trim()){const n=classes.filter(x=>x.niveau==$("k1").value).length;$("k2").value=$("k1").value+(n?" "+String.fromCharCode(65+n):"")}};
+  $("s1").onclick=async()=>{
+    const v=i=>$(i).value.trim(),e=$("fe");e.textContent="";const cap=parseInt(v("k4"),10);
+    if(!v("k1")||!v("k2")){e.textContent="Choisissez le niveau et écrivez le nom de la classe.";return}
+    if(!(cap>0)){e.textContent="Entrez une capacité supérieure à 0.";return}
+    if(classes.some(x=>x.id!=id&&x.nom.toLowerCase()==v("k2").toLowerCase())){e.textContent="Une classe porte déjà ce nom.";return}
+    $("s1").disabled=true;
+    try{
+      const ref=id?doc(db,"classes",id):doc(collection(db,"classes")),w=writeBatch(db);
+      w.set(ref,{nom:v("k2"),niveau:v("k1"),titulaire:v("k3"),capacite:cap});
+      if(id&&(c.nom!=v("k2")||c.niveau!=v("k1")))students.filter(s=>s.classe==c.nom).forEach(s=>{const {id:_i,...r}=s;w.set(doc(db,"students",s.id),{...r,classe:v("k2"),niveau:v("k1")})});
+      await w.commit();closeM();toast(id?"Classe modifiée":"Classe ajoutée");
     }catch(x){$("s1").disabled=false;e.textContent=frErr(x)}
   };
 }
@@ -332,11 +380,12 @@ function demoLib(){
     const E=[["Camara","Fatoumata","Fille","1e","2018-03-12","Mariam Camara","621 11 22 33"],["Diakité","Mamadou","Garçon","3e","2016-07-02","Sékou Diakité","622 44 55 66"],["Keïta","Aïssata","Fille","6e","2013-11-21","Salif Keïta","621 77 88 99"],["Traoré","Ibrahima","Garçon","7e","2012-01-30","Naby Traoré","628 10 20 30"],["Sylla","Kadiatou","Fille","9e","2010-05-18","Hawa Sylla","664 12 34 56"],["Condé","Alpha","Garçon","11e","2008-09-09","Moussa Condé","655 98 76 54"],["Bangoura","Mariama","Fille","12e","2007-12-25","Fanta Bangoura","666 33 22 11"],["Touré","Sory","Garçon","Terminale","2006-04-04","Kaba Touré","620 55 44 33"]];
     E.forEach((e,i)=>{
       const id="e"+(i+1),mat="WSF-2026-"+String(i+1).padStart(4,"0"),uid="u-"+id;
-      d["students/"+id]={matricule:mat,nom:e[0],pre:e[1],sx:e[2],niveau:e[3],dn:e[4],ln:"Kankan",ad:"Kankan",ec:"",pn:e[5],pt:e[6],uid};
+      d["students/"+id]={matricule:mat,nom:e[0],pre:e[1],sx:e[2],niveau:e[3],classe:({"6e":"6e A","7e":"7e A"})[e[3]]||e[3],dn:e[4],ln:"Kankan",ad:"Kankan",ec:"",pn:e[5],pt:e[6],uid};
       d["users/"+uid]={nom:e[5],role:"parent",eleveId:id,actif:true,identifiant:mat};
       d["codes/"+id]={code:"123456"};
       a[mat.toLowerCase()+D]={uid,pw:"123456"};
     });
+    [["1e","1e","Mme Camara",40],["2e","2e","M. Keïta",40],["3e","3e","Mme Sylla",40],["4e","4e","M. Traoré",40],["5e","5e","Mme Condé",40],["6e","6e A","M. Diakité",40],["6e","6e B","Mme Touré",40],["7e","7e A","M. Bangoura",42],["7e","7e B","Mme Doumbouya",42],["8e","8e","M. Sidibé",50],["9e","9e","Mme Soumah",50],["10e","10e","M. Konaté",50],["11e","11e","Mme Fofana",45],["12e","12e","M. Cissé",45],["Terminale","Terminale","M. Barry",50]].forEach((c,i)=>{d["classes/c"+(i+1)]={nom:c[1],niveau:c[0],titulaire:c[2],capacite:c[3]}});
     d["config/compteur"]={n:E.length};
     d["users/u-dir"]={nom:"Directeur (démo)",role:"direction",actif:true,identifiant:"620 00 00 00"};d["codes/u-dir"]={code:"demo123"};a["t620000000"+D]={uid:"u-dir",pw:"demo123"};
     d["users/u-ens"]={nom:"M. Sidibé (démo)",role:"enseignant",actif:true,identifiant:"620 00 00 02"};d["codes/u-ens"]={code:"demo123"};a["t620000002"+D]={uid:"u-ens",pw:"demo123"};
