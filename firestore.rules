@@ -42,6 +42,78 @@ service cloud.firestore {
       allow create, update, delete: if isDirection();
     }
 
+    // Classes : le personnel voit, la direction modifie
+    match /classes/{id} {
+      allow read: if active();
+      allow write: if isDirection();
+    }
+
+    // Enseignants : le personnel voit, la direction modifie
+    match /teachers/{id} {
+      allow read: if isStaff();
+      allow write: if isDirection();
+    }
+
+    // Notes : la direction saisit, le personnel voit, un parent ne voit que son enfant
+    match /grades/{id} {
+      allow read: if isStaff()
+        || (active() && profile().role == 'parent' && id.matches(profile().eleveId + '_[123]'));
+      allow write: if isDirection();
+    }
+
+    // Frais : la direction gère, un parent voit les paiements de son enfant
+    match /payments/{id} {
+      allow read: if isDirection()
+        || (active() && profile().role == 'parent' && resource.data.eleveId == profile().eleveId);
+      allow write: if isDirection();
+    }
+
+    // Absences : le personnel fait l'appel, un parent voit celles de son enfant
+    match /absences/{id} {
+      allow read: if isStaff()
+        || (active() && profile().role == 'parent' && resource.data.eleveId == profile().eleveId);
+      allow write: if isStaff();
+    }
+    match /appel/{id} {
+      allow read, write: if isStaff();
+    }
+
+    // Discipline : le personnel ajoute, la direction modifie
+    match /discipline/{id} {
+      allow read, create: if isStaff();
+      allow update, delete: if isDirection();
+    }
+
+    // Réclamations : un parent dépose et suit les siennes, la direction traite
+    match /claims/{id} {
+      allow read: if isDirection()
+        || (active() && profile().role == 'parent' && resource.data.eleveId == profile().eleveId);
+      allow create: if isDirection()
+        || (active() && profile().role == 'parent'
+            && request.resource.data.eleveId == profile().eleveId
+            && request.resource.data.st == 'Nouvelle');
+      allow update, delete: if isDirection();
+    }
+
+    // Annonces, discussions et emplois du temps
+    match /annonces/{id} {
+      allow read: if active();
+      allow write: if isDirection();
+    }
+    match /threads/{id} {
+      allow read, write: if active() && (request.auth.uid == id || isDirection());
+    }
+    match /edt/{id} {
+      allow read: if active();
+      allow write: if isDirection();
+    }
+
+    // Journal des modifications
+    match /journal/{id} {
+      allow read: if isDirection();
+      allow create: if isStaff();
+    }
+
     // Codes d'accès : visibles seulement par la direction
     match /codes/{id} {
       allow read, write: if isDirection();
