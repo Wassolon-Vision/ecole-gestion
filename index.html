@@ -215,14 +215,14 @@ function loginForm(msg,parent){
   <div class="tabs" role="tablist"><button id="tp" aria-selected="${!!parent}">Parent ou élève</button><button id="ts" aria-selected="${!parent}">Personnel</button></div>
   <label for="i1">${parent?"Matricule de l’élève":"Numéro de téléphone"}</label><input id="i1" ${parent?'placeholder="WSF-2026-0001" autocapitalize="characters"':'type="tel" inputmode="tel" placeholder="620 00 00 00"'} autocomplete="username">
   <label for="i2">${parent?"Code":"Mot de passe"}</label><input id="i2" type="password" autocomplete="current-password">
-  <div class="err" id="ae" role="alert">${esc(msg||"")}</div><button class="btn full" id="go">Se connecter</button>${DEMO?demoBox():""}${installBox()}`;if(DEMO)bindDemo();bindInstall();
+  <div class="err" id="ae" role="alert">${esc(msg||"")}</div><button class="btn full" id="go">Se connecter</button><div class="sm" style="margin-top:10px;text-align:center">${DEMO?"Mode démonstration : données d’essai, gardées seulement sur cet appareil.":"Connexion à la base de données réelle de l’école."}</div>${DEMO?demoBox():""}${installBox()}`;if(DEMO)bindDemo();bindInstall();
   $("tp").onclick=()=>loginForm("",true);$("ts").onclick=()=>loginForm("",false);
   const go=async()=>{
     const a=$("i1").value.trim(),p=$("i2").value;
     if(!a||!p){$("ae").textContent="Remplissez les deux champs.";return}
     $("go").disabled=true;$("ae").textContent="";
     try{await signInWithEmailAndPassword(auth,email(a,parent),p)}
-    catch(e){$("ae").textContent=frErr(e);$("go").disabled=false}
+    catch(e){$("ae").textContent=frErr(e)+(["auth/invalid-credential","auth/wrong-password","auth/user-not-found"].includes(e.code)?(parent?" Écrivez le matricule avec ses tirets (WSF-2026-0001) et le code à 6 chiffres remis par l’école.":" Écrivez le numéro de téléphone donné à l’école (pas votre nom) et le mot de passe."):"");$("go").disabled=false}
   };
   $("go").onclick=go;$("i2").onkeydown=e=>{if(e.key=="Enter")go()};
 }
